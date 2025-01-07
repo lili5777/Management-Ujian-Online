@@ -51,7 +51,7 @@
                 </div>
                 <div class="mb-4 relative">
                     <label for="password" class="block text-gray-700 font-semibold">Password</label>
-                    <input type="password" id="password" name="password" name="password"
+                    <input type="password" id="password" name="password" 
                         {{ isset($user) ? '' : 'required' }}
                         placeholder="{{ isset($user) ? 'Kosongkan jika tidak ingin mengubah password' : '' }}"
                         class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-amber-500">

@@ -4,7 +4,7 @@
     <div class="flex-1 ml-64 p-6">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold">Data Siswa</h1>
+            <h1 class="text-3xl font-bold">Data Mahasiswa</h1>
             <div class="flex items-center space-x-4">
                 <span class="text-gray-700">{{ Auth::user()->name }} | {{ Auth::user()->level }}</span>
                 <a href="{{ route('logout') }}" class="bg-red-500 text-white py-2 px-4 rounded">Logout</a>
