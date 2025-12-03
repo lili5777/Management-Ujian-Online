@@ -206,9 +206,6 @@ class Usercontroller extends Controller
     }
 
 
-
-
-
     // mapel
     public function datamapel()
     {
