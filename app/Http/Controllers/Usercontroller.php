@@ -282,11 +282,18 @@ class Usercontroller extends Controller
     // kelas
     public function datakelas()
     {
-        $data = Kelas::all();
-        $wali = User::all();
+        // $data = Kelas::all();
+        $wali = User::where('level', 'guru')->get();
+        $walikelas = Kelas::all();
         $mapel = MapelKelas::all();
         $siswa = SiswaKelas::all();
-        return view('admin.kelas.kelasindex', compact('data', 'wali', 'mapel', 'siswa'));
+
+        if(auth()->user()->level == 'guru'){
+            $data = Kelas::where('wali', auth()->user()->id)->get();
+        }else{
+            $data = Kelas::all();
+        }
+        return view('admin.kelas.kelasindex', compact('data', 'wali', 'mapel', 'siswa','walikelas'));
     }
 
     public function tambahkelas()
@@ -422,10 +429,7 @@ class Usercontroller extends Controller
         }
     }
 
-
-
-
-
+    
     // mapel kelas
     public function datamapelkelas($id)
     {
@@ -835,41 +839,71 @@ class Usercontroller extends Controller
 
 
     // ujian
-    public function ujian($id, $mapel, $jadwal)
+    public function ujian($id, $mapel, $jadwalId)
     {
-        $data = Soal::where('id_kelas', $id)->where('id_mapelkelas', $mapel)->where('id_jadwal', $jadwal)->get();
-        $jadwal = Jadwal::where('id', $jadwal)->first();
+        // Ambil data soal
+        $data = Soal::where('id_kelas', $id)
+            ->where('id_mapelkelas', $mapel)
+            ->where('id_jadwal', $jadwalId)
+            ->get();
+
+        // Ambil data jadwal
+        $jadwal = Jadwal::find($jadwalId);
+
+        if (!$jadwal) {
+            abort(404, 'Jadwal ujian tidak ditemukan');
+        }
+
         $kelas = $id;
-        $mapel;
-        $head = Kelas::where('id', $kelas)->first();
+        $head = Kelas::find($kelas);
+        $mapelData = Mapel::find($mapel);
+
+        // Hitung deadline berdasarkan waktu ujian
         $deadline = now()->addHours((int)$jadwal->jam)->addMinutes((int)$jadwal->menit)->timestamp;
-        // dd($jadwal);
-        // dd(now()->timezone('Asia/Makassar')->toDateTimeString());
-        return view('admin.ujian.ujianindex', compact('data', 'kelas', 'head', 'mapel', 'jadwal', 'deadline'));
+
+        return view('admin.ujian.ujianindex', compact('data', 'kelas', 'head', 'mapel', 'jadwal', 'mapelData', 'deadline'));
     }
 
     public function simpanHasil(Request $request, $id, $mapel, $jadwal)
     {
-        // dd($request->all());
         $user = Auth::user();
-        // Mengambil data soal berdasarkan ujian yang dimaksud
+
+        // VALIDASI: Cek apakah sudah pernah mengerjakan
+        $hasilSebelumnya = Hasil::where('id_user', $user->id)
+            ->where('id_kelas', $id)
+            ->where('id_mapelkelas', $mapel)
+            ->where('id_jadwal', $jadwal)
+            ->first();
+
+        if ($hasilSebelumnya) {
+            return redirect()->route('hasilujian', [
+                'id' => $id,
+                'mapel' => $mapel,
+                'jadwal' => $jadwal
+            ])->with('warning', 'Anda sudah mengerjakan ujian ini sebelumnya!');
+        }
+
+        // Mengambil data soal
         $soals = Soal::where('id_kelas', $id)
             ->where('id_mapelkelas', $mapel)
             ->where('id_jadwal', $jadwal)
             ->get();
+
+        // Validasi jika tidak ada soal
+        if ($soals->count() == 0) {
+            return redirect()->back()->with('error', 'Tidak ada soal untuk ujian ini!');
+        }
 
         // Inisialisasi variabel untuk menghitung skor
         $jumlahSoal = $soals->count();
         $jawabanBenar = 0;
         $jawabanSalah = 0;
         $jawabanKosong = 0;
-        $skor = 0;
 
         // Mengiterasi soal dan mengecek jawaban
         foreach ($soals as $soal) {
-            $userAnswer = $request->input("jawaban_{$soal->id}"); // Mendapatkan jawaban dari form
+            $userAnswer = $request->input("jawaban_{$soal->id}");
 
-            // Menilai jawaban
             if (is_null($userAnswer)) {
                 $jawabanKosong++;
             } elseif ($userAnswer == $soal->kunci) {
@@ -878,51 +912,61 @@ class Usercontroller extends Controller
                 $jawabanSalah++;
             }
         }
-        if ($jumlahSoal > 0) {
-            $skor = ($jawabanBenar / $jumlahSoal) * 100; // Calculate the percentage score
 
-            // Ensure the score is not more than 100
+        // Hitung skor
+        $skor = 0;
+        if ($jumlahSoal > 0) {
+            $skor = ($jawabanBenar / $jumlahSoal) * 100;
             $skor = min($skor, 100);
+            $skor = round($skor, 2); // Bulatkan 2 angka di belakang koma
         }
 
-        $soal = new Hasil();
-        $soal->id_user = $user->id;
-        $soal->id_kelas = $id;
-        $soal->id_mapelkelas = $mapel;
-        $soal->id_jadwal = $jadwal;
-        $soal->jumlah_soal = $jumlahSoal;
-        $soal->jawaban_benar = $jawabanBenar;
-        $soal->jawaban_salah = $jawabanSalah;
-        $soal->jawaban_kosong = $jawabanKosong;
-        $soal->skor = $skor;
-        $soal->save();
+        // Simpan hasil
+        $hasil = new Hasil();
+        $hasil->id_user = $user->id;
+        $hasil->id_kelas = $id;
+        $hasil->id_mapelkelas = $mapel;
+        $hasil->id_jadwal = $jadwal;
+        $hasil->jumlah_soal = $jumlahSoal;
+        $hasil->jawaban_benar = $jawabanBenar;
+        $hasil->jawaban_salah = $jawabanSalah;
+        $hasil->jawaban_kosong = $jawabanKosong;
+        $hasil->skor = $skor;
+        $hasil->save();
 
-        // Mengarahkan ke halaman hasil ujian atau memberi respon sukses
-        return redirect()->route('hasilujian', ['id' => $id, 'mapel' => $mapel, 'jadwal' => $jadwal])
-            ->with('status', 'Hasil ujian telah disimpan!');
+        return redirect()->route('hasilujian', [
+            'id' => $id,
+            'mapel' => $mapel,
+            'jadwal' => $jadwal
+        ])->with('success', 'Hasil ujian telah disimpan!');
     }
 
     // Di controller untuk menampilkan hasil
-    public function hasilUjian($id, $mapel, $jadwal)
+    public function hasilujian($id, $mapel, $jadwal)
     {
-        $kelas = $id;
-        $mapel;
-        $user = User::all();
-        $head = Kelas::where('id', $kelas)->first();
-        $data = Hasil::where('id_kelas', $id)
-            ->where('id_mapelkelas', $mapel)
-            ->where('id_jadwal', $jadwal)
-            ->where('id_user', Auth::id()) // Filter by logged-in user
-            ->first();
-        // dd($hasil);
+        $userId = Auth::id();
 
-        return view('admin.hasil.hasilindex', compact('data', 'head', 'user'));
+        // Ambil hasil ujian spesifik untuk user yang login
+        $data = Hasil::where('id_jadwal', $jadwal)
+            ->where('id_user', $userId)
+            ->first();
+
+        $user = User::all();
+        $kelas = $id;
+        $head = Kelas::find($kelas);
+        $jadwalData = Jadwal::find($jadwal);
+
+        return view('admin.hasil.hasilindex', compact('data', 'user', 'kelas', 'mapel', 'jadwal', 'head', 'jadwalData'));
     }
 
     public function datahasil($id, $mapel, $jadwal)
     {
         $user = User::all();
-        $data = Hasil::where('id_jadwal', $jadwal)->get();;
-        return view('admin.hasil.hasilindex', compact('data', 'user'));
+        $data = Hasil::where('id_jadwal', $jadwal)->get();
+        $kelas = $id;
+        $head = Kelas::find($kelas);
+        $jadwalData = Jadwal::find($jadwal);
+
+        return view('admin.hasil.hasilindex', compact('data', 'user', 'kelas', 'mapel', 'jadwal', 'head', 'jadwalData'));
     }
 }

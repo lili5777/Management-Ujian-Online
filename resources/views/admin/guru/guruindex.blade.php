@@ -54,7 +54,7 @@
         <!-- Dashboard Content -->
         <div class="p-4 sm:p-6 lg:p-8">
             <!-- Stats Overview -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-xl p-6 text-white">
                     <div class="flex items-center justify-between mb-4">
                         <div class="p-3 bg-white/20 backdrop-blur-sm rounded-xl">
@@ -97,7 +97,7 @@
                     <p class="text-3xl font-bold">{{ $data->where('jekel', 'p')->count() }}</p>
                 </div>
 
-                <div class="bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl shadow-xl p-6 text-white">
+                {{-- <div class="bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl shadow-xl p-6 text-white">
                     <div class="flex items-center justify-between mb-4">
                         <div class="p-3 bg-white/20 backdrop-blur-sm rounded-xl">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,7 +109,7 @@
                     </div>
                     <h3 class="text-sm font-medium text-purple-100 mb-2">Rata-rata Usia</h3>
                     <p class="text-3xl font-bold">-</p>
-                </div>
+                </div> --}}
             </div>
 
             <!-- Main Content Card -->

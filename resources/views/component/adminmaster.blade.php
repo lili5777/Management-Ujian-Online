@@ -152,7 +152,7 @@
                     </a>
                 @endif
 
-                @if (Auth::user()->level == 'admin' || Auth::user()->level == 'guru' || Auth::user()->level == 'siswa')
+                
                     <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-3 mt-6">Akademik</p>
 
                     <a href="{{ route('datamapel') }}"
@@ -166,11 +166,20 @@
                             class="font-medium {{ request()->routeIs('datamapel') ? 'text-white' : 'text-gray-300' }}">Data
                             Mapel</span>
                     </a>
-
+                @if (Auth::user()->level == 'siswa')
                     <a href="{{ route('showRoomKelas') }}"
                         class="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/10 group">
                         <svg class="w-5 h-5 text-gray-400 group-hover:text-amber-400" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                        <span class="font-medium text-gray-300">Kelas</span>
+                    </a>
+                @endif
+                @if (Auth::user()->level == 'admin' || Auth::user()->level == 'guru')
+                    <a href="{{ route('datakelas') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/10 group">
+                        <svg class="w-5 h-5 text-gray-400 group-hover:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>

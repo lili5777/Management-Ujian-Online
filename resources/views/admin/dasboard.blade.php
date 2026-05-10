@@ -136,7 +136,7 @@
                         <span class="text-xs font-semibold bg-white/30 px-3 py-1 rounded-full">Kelas</span>
                     </div>
                     <h3 class="text-sm font-medium text-pink-100 mb-2">Total Kelas</h3>
-                    <p class="text-3xl font-bold mb-2">0</p>
+                    <p class="text-3xl font-bold mb-2">{{ $kelas }}</p>
                     <div class="mt-4 pt-4 border-t border-white/20">
                         <div class="flex items-center space-x-2 text-xs">
                             <div class="w-full bg-white/20 rounded-full h-2">
@@ -199,7 +199,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="bg-amber-50 p-4 rounded-xl border border-amber-100">
                                         <div class="flex items-center space-x-2 mb-2">
                                             <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
@@ -221,7 +221,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mt-6 pt-6 border-t border-gray-200">
                                     <h4 class="text-sm font-semibold text-gray-700 mb-3">Statistik</h4>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -291,7 +291,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="bg-amber-50 p-4 rounded-xl border border-amber-100">
                                         <div class="flex items-center space-x-2 mb-2">
                                             <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
@@ -313,7 +313,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mt-6 pt-6 border-t border-gray-200">
                                     <h4 class="text-sm font-semibold text-gray-700 mb-3">Statistik</h4>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -513,7 +513,7 @@
                     card.addEventListener('mouseenter', function() {
                         this.style.transform = 'scale(1.05) translateY(-4px)';
                     });
-                    
+
                     card.addEventListener('mouseleave', function() {
                         this.style.transform = 'scale(1) translateY(0)';
                     });
@@ -525,7 +525,7 @@
                 card.addEventListener('mouseenter', function() {
                     this.style.transform = 'translateY(-4px)';
                 });
-                
+
                 card.addEventListener('mouseleave', function() {
                     this.style.transform = 'translateY(0)';
                 });

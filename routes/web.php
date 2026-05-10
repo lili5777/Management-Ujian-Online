@@ -109,7 +109,7 @@ Route::group(['middleware' => ['auth']], function () {
     // mengerjakan ujian
     // soal
     Route::get('/ujian/{id}/{mapel}/{jadwal}', [Usercontroller::class, 'ujian'])->name('ujian');
-    Route::post('/ujian/{id}/{mapel}/{jadwal}', [UserController::class, 'simpanHasil'])->name('posujian');
+    Route::post('/ujian/{id}/{mapel}/{jadwal}', [UserController::class, 'simpanHasil'])->name('simpanhasil');
     Route::get('/hasil-ujian/{id}/{mapel}/{jadwal}', [UserController::class, 'hasilUjian'])->name('hasilujian');
 
 
